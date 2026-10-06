@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sach Mein Sahi Hai?</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#faf7f2;--card:#fff;--tx:#1d2433;--mu:#667085;--bd:#e7e1d6;--pr:#1f3a8a;--g:#16794c;--y:#b7860b;--o:#c2570c;--r:#c0262d;--w:#fff4e5}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12151c;--card:#1b2030;--tx:#eef1f7;--mu:#98a2b3;--bd:#2b3247;--pr:#8fa8ff;--g:#4ade9b;--y:#f2c14e;--o:#fb923c;--r:#ff6b72;--w:#33260f}}
+:root[data-theme="dark"]{--bg:#12151c;--card:#1b2030;--tx:#eef1f7;--mu:#98a2b3;--bd:#2b3247;--pr:#8fa8ff;--g:#4ade9b;--y:#f2c14e;--o:#fb923c;--r:#ff6b72;--w:#33260f}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:16px}
+header{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.logo{font-weight:800;font-size:20px;color:var(--pr)}.logo span{color:var(--o)}
+select,button,textarea,input{font:inherit;color:inherit}
+select{background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:6px 8px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:16px;margin-top:14px}
+h1{font-size:26px;margin:18px 0 2px}h2{font-size:17px;margin:0 0 8px}.mu{color:var(--mu);font-size:14px}
+textarea{width:100%;min-height:120px;border:1px solid var(--bd);border-radius:12px;padding:12px;background:var(--bg);resize:vertical}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.chip{border:1px solid var(--bd);background:var(--card);border-radius:999px;padding:8px 14px;cursor:pointer}
+.chip:hover{border-color:var(--pr)}
+.go{background:var(--pr);color:var(--bg);border:0;border-radius:12px;padding:12px 20px;font-weight:700;cursor:pointer;width:100%;margin-top:12px}
+.badge{display:inline-block;border-radius:999px;padding:4px 12px;font-weight:700;font-size:14px;color:#fff}
+.b-r{background:var(--r)}.b-o{background:var(--o)}.b-y{background:var(--y)}.b-w{background:#667085}
+.warn{background:var(--w);border:1px solid var(--o);border-radius:12px;padding:10px 12px;margin-top:10px;font-weight:600}
+ul{margin:6px 0;padding-left:20px}li{margin:3px 0}
+.tag{font-size:12px;font-weight:700;border:1px solid var(--bd);border-radius:6px;padding:1px 6px;margin-right:4px;color:var(--mu)}
+.bar{height:8px;background:var(--bd);border-radius:8px;overflow:hidden}.bar i{display:block;height:100%;background:var(--pr)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center}.stats b{display:block;font-size:22px}
+table{width:100%;border-collapse:collapse;font-size:14px}td,th{text-align:left;padding:6px 4px;border-bottom:1px solid var(--bd)}
+a{color:var(--pr)}.hide{display:none}
+.chat{display:flex;gap:6px;margin-top:8px}.chat input{flex:1;border:1px solid var(--bd);border-radius:10px;padding:8px;background:var(--bg)}
+.chat button{border:0;border-radius:10px;background:var(--pr);color:var(--bg);padding:8px 14px;cursor:pointer}
+</style></head><body><div class="wrap">
+<header><div class="logo">Sach Mein <span>Sahi Hai?</span></div>
+<div><select id="lang" aria-label="Language"><option value="en">English</option><option value="hi">हिन्दी</option><option value="hn" selected>Hinglish</option></select></div></header>
+<h1 id="hero"></h1><div class="mu" id="tag"></div>
+
+<div class="card">
+<textarea id="inp" aria-label="Input"></textarea>
+<div class="row">
+<label class="chip">📸 <span data-t="shot"></span><input type="file" id="shot" accept="image/png,image/jpeg" hidden></label>
+<label class="chip">📄 <span data-t="pdf"></span><input type="file" id="pdf" accept="application/pdf" hidden></label>
+<button class="chip" id="urlb">🔗 <span data-t="url"></span></button>
+<button class="chip" id="mic">🎤 <span data-t="speak"></span></button>
+<button class="chip" id="paste">📋 <span data-t="paste"></span></button>
+</div>
+<button class="go" id="go"></button>
+<div class="mu" style="margin-top:8px" id="priv"></div>
+</div>
+
+<div id="res"></div>
+
+<div class="card"><h2 data-t="risk"></h2><div class="stats" id="stats"></div></div>
+<div class="card"><h2 data-t="hist"></h2><input id="q" class="chat" style="width:100%;border:1px solid var(--bd);border-radius:10px;padding:8px;background:var(--bg)" placeholder="🔍">
+<table id="hist"></table><button class="chip" id="clr" style="margin-top:10px"></button></div>
+<p class="mu" id="foot"></p>
+</div>
+<script>
+const T={
+en:{hero:"Something looks suspicious?",tag:"Forward it. We'll check it.",ph:"Paste a message, or upload a screenshot, PDF or URL…",shot:"Upload Screenshot",pdf:"Upload PDF",url:"Check URL",speak:"Speak",paste:"Paste Text",go:"Check now",priv:"Your text is analysed in your browser in this prototype. In the full app, text may be sent to third-party AI/search providers and you will be told first.",risk:"Risk Summary",hist:"Verification History",clr:"Delete my history",why:"Why did we give this result?",flags:"Red Flags",todo:"What You Should Do",ev:"Evidence",cat:"Category",conf:"Confidence",claim:"Claim",copy:"Copy Summary",print:"Download PDF (Print)",chatph:"Ask a follow-up (e.g. I already paid)…",none:"No history yet.",V:{r:"🔴 HIGH RISK",o:"🟠 SUSPICIOUS",y:"🟡 PARTIALLY VERIFIED",w:"⚪ CANNOT VERIFY"},vd:{r:"Likely misleading / potentially fraudulent. Do not proceed until independently verified.",o:"Several warning signs. We can't confirm it is a scam, but be careful.",y:"Some details look normal, but key details can't be confirmed.",w:"We could not independently verify this claim."},es:{r:"Moderate (pattern-based)",o:"Weak",y:"Weak",w:"No reliable evidence"},evn:"Live research is not connected in this prototype. Check these official sources yourself:",fact:"Evidence-based assessment",inf:"AI inference",unv:"Unverified claim",med:"This tool is not a doctor. Do not stop prescribed medicine based on this.",wp:"⚠️ Don't send money until this offer is independently verified.",wo:"⚠️ Never share an OTP, UPI PIN, card PIN, CVV or password with anyone.",foot:"Prototype: checks use simple pattern rules, not live web research or a real AI model. Results are an assessment, never a certainty."},
+hn:{hero:"Kuch suspicious lag raha hai?",tag:"Forward it. We'll check it.",ph:"Message paste karo, ya screenshot, PDF ya URL daalo…",shot:"Screenshot Upload",pdf:"PDF Upload",url:"URL Check",speak:"Bolo",paste:"Text Paste",go:"Abhi check karo",priv:"Is prototype me text aapke browser me hi check hota hai. Full app me text third-party AI/search providers ko ja sakta hai, aur aapko pehle bataya jayega.",risk:"Risk Summary",hist:"Verification History",clr:"Meri history delete karo",why:"Ye result kyun diya?",flags:"Red Flags",todo:"Ab Kya Karein",ev:"Evidence",cat:"Category",conf:"Confidence",claim:"Claim",copy:"Summary Copy",print:"PDF Download (Print)",chatph:"Aur kuch poochho (jaise: maine pay kar diya)…",none:"Abhi koi history nahi.",V:{r:"🔴 HIGH RISK",o:"🟠 SUSPICIOUS",y:"🟡 PARTIALLY VERIFIED",w:"⚪ CANNOT VERIFY"},vd:{r:"Misleading ya fraud hone ki sambhavna zyada hai. Independently verify hone tak aage na badhein.",o:"Kai warning signs hain. Scam confirm nahi kar sakte, par savdhan rahein.",y:"Kuch baatein theek lagti hain, par zaroori details confirm nahi hui.",w:"Humein kisi reliable source par is claim ki confirmation nahi mili."},es:{r:"Moderate (pattern-based)",o:"Weak",y:"Weak",w:"Koi reliable evidence nahi"},evn:"Is prototype me live research connected nahi hai. Ye official sources khud check karein:",fact:"Evidence-based assessment",inf:"AI inference",unv:"Unverified claim",med:"Ye tool doctor nahi hai. Is analysis ke basis par prescribed dawai band na karein.",wp:"⚠️ Offer verify hone tak paisa mat bhejein.",wo:"⚠️ OTP, UPI PIN, card PIN, CVV ya password kisi ko na batayein.",foot:"Prototype: check simple pattern rules par chalta hai, live web research ya real AI model par nahi. Result ek assessment hai, pakka sach nahi."},
+hi:{hero:"कुछ संदिग्ध लग रहा है?",tag:"मानने से पहले, चेक कर लो।",ph:"संदेश पेस्ट करें, या स्क्रीनशॉट, PDF या URL दें…",shot:"स्क्रीनशॉट अपलोड",pdf:"PDF अपलोड",url:"URL जाँचें",speak:"बोलें",paste:"टेक्स्ट पेस्ट",go:"अभी जाँचें",priv:"इस प्रोटोटाइप में टेक्स्ट आपके ब्राउज़र में ही जाँचा जाता है। पूरे ऐप में टेक्स्ट थर्ड-पार्टी AI/सर्च प्रदाताओं को जा सकता है, और आपको पहले बताया जाएगा।",risk:"जोखिम सारांश",hist:"जाँच का इतिहास",clr:"मेरा इतिहास मिटाएँ",why:"यह नतीजा क्यों?",flags:"चेतावनी संकेत",todo:"अब क्या करें",ev:"प्रमाण",cat:"श्रेणी",conf:"भरोसा",claim:"दावा",copy:"सारांश कॉपी",print:"PDF डाउनलोड (प्रिंट)",chatph:"और पूछें (जैसे: मैंने पैसे दे दिए)…",none:"अभी कोई इतिहास नहीं।",V:{r:"🔴 उच्च जोखिम",o:"🟠 संदिग्ध",y:"🟡 आंशिक रूप से सत्यापित",w:"⚪ सत्यापित नहीं हो सका"},vd:{r:"भ्रामक या धोखाधड़ी की आशंका ज़्यादा है। स्वतंत्र पुष्टि होने तक आगे न बढ़ें।",o:"कई चेतावनी संकेत हैं। स्कैम पक्का नहीं कह सकते, पर सावधान रहें।",y:"कुछ बातें ठीक लगती हैं, पर ज़रूरी जानकारी की पुष्टि नहीं हुई।",w:"हमें किसी भरोसेमंद स्रोत पर इस दावे की पुष्टि नहीं मिली।"},es:{r:"मध्यम (पैटर्न आधारित)",o:"कमज़ोर",y:"कमज़ोर",w:"कोई भरोसेमंद प्रमाण नहीं"},evn:"इस प्रोटोटाइप में लाइव रिसर्च जुड़ा नहीं है। ये आधिकारिक स्रोत खुद देखें:",fact:"प्रमाण-आधारित आकलन",inf:"AI अनुमान",unv:"अपुष्ट दावा",med:"यह टूल डॉक्टर नहीं है। इसके आधार पर निर्धारित दवा बंद न करें।",wp:"⚠️ ऑफ़र की स्वतंत्र पुष्टि होने तक पैसे न भेजें।",wo:"⚠️ OTP, UPI PIN, कार्ड PIN, CVV या पासवर्ड किसी को न बताएँ।",foot:"प्रोटोटाइप: जाँच सरल पैटर्न नियमों पर चलती है, लाइव वेब रिसर्च या असली AI मॉडल पर नहीं। नतीजा एक आकलन है, पक्का सच नहीं।"}};
+// rules: regex, weight, category, [en,hn,hi] flag text
+const R=[
+[/(registration fee|processing fee|advance|deposit|pay\s*(₹|rs)|fee of|₹\s?[\d,]+\s*(pay|bhej|send)|paisa bhej|payment)/i,25,"Scam/Fraud",["Payment requested upfront","Pehle paisa maangna","पहले पैसे माँगे गए"]],
+[/(otp|upi pin|cvv|password|card number|aadhaar|aadhar)/i,25,"Scam/Fraud",["Sensitive details asked (OTP / PIN / ID)","OTP/PIN/ID jaisi sensitive jaankari maangi gayi","OTP/PIN/पहचान जैसी संवेदनशील जानकारी माँगी गई"]],
+[/(guarantee|assured|risk[- ]free|\d+\s?%\s*(monthly|per month|daily|weekly|return))/i,30,"Investment",["Guaranteed / unrealistic returns","Guaranteed ya unrealistic returns ka wada","पक्के या अवास्तविक रिटर्न का वादा"]],
+[/(urgent|last date|today only|hurry|limited seats|jaldi|abhi register|expires)/i,12,"Other",["Urgency / pressure to act fast","Jaldi karne ka pressure","जल्दी करने का दबाव"]],
+[/(100\s?%\s*cure|miracle|permanent cure|cures? (diabetes|cancer)|completely cures)/i,30,"Medical/Health",["Miracle / 100% cure claim","Miracle ya 100% cure ka daava","चमत्कारी / 100% इलाज का दावा"]],
+[/(work from home|earn\s*(₹|rs)\s?[\d,]+|data entry|per month.*(no experience|part[- ]time)|no experience)/i,18,"Job/Employment",["Unrealistic job / salary offer","Unrealistic job ya salary ka offer","अवास्तविक नौकरी / वेतन का ऑफ़र"]],
+[/(iphone|50\s?%\s*below|90\s?%\s*off|₹\s?9,?999|lowest price ever)/i,18,"Online Shopping",["Price looks too good to be true","Price bahut zyada sasta, sach hone jaisa nahi","कीमत सच होने के लिए बहुत कम"]],
+[/(government|sarkar|yojana|scheme|pm[- ]|subsidy|every (citizen|woman)|sabhi)/i,8,"Government Scheme",["Claims a government scheme; no official match checked here","Sarkari scheme ka claim; yahan official match check nahi hua","सरकारी योजना का दावा; आधिकारिक मिलान यहाँ जाँचा नहीं गया"]]];
+const LANG=()=>document.getElementById('lang').value,t=k=>T[LANG()][k];
+const $=id=>document.getElementById(id);let last=null,H=[];
+try{H=JSON.parse(localStorage.getItem('smsh')||'[]')}catch(e){}
+const save=()=>{try{localStorage.setItem('smsh',JSON.stringify(H))}catch(e){}};
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function analyse(x){
+ let s=0,cats={},fl=[],hits=[];
+ R.forEach(r=>{if(r[0].test(x)){s+=r[1];cats[r[2]]=(cats[r[2]]||0)+r[1];fl.push(r[3]);hits.push(r[0])}});
+ const u=x.match(/https?:\/\/[^\s]+|www\.[^\s]+/i);
+ if(u&&!/\.(gov|nic)\.in/i.test(u[0])){s+=15;fl.push(["Link is not a .gov.in / .nic.in domain","Link .gov.in / .nic.in domain nahi hai","लिंक .gov.in / .nic.in डोमेन नहीं है"])}
+ const cat=Object.keys(cats).sort((a,b)=>cats[b]-cats[a])[0]||"Other";
+ const v=s>=55?'r':s>=28?'o':s>0?'y':'w';
+ const conf=v==='w'?35:Math.min(92,50+s/2);
+ return{v,cat,fl,conf:Math.round(conf),med:cat==="Medical/Health",pay:/pay|fee|deposit|payment|paisa/i.test(x),otp:/otp|pin|cvv|password/i.test(x),claim:x.trim().slice(0,160)}
+}
+function todo(a){const L=LANG();const d={en:["Do not pay or share personal details.","Check the scheme/offer on the official website (type the address yourself).","If you already paid: call your bank/UPI app now, and report at cybercrime.gov.in or call 1930."],hn:["Paisa na dein, personal details share na karein.","Scheme/offer official website par khud address type karke check karein.","Agar pay kar diya: turant bank/UPI app ko call karein aur cybercrime.gov.in par report karein ya 1930 dial karein."],hi:["पैसे न दें, निजी जानकारी साझा न करें।","योजना/ऑफ़र को आधिकारिक वेबसाइट पर खुद पता टाइप करके जाँचें।","अगर पैसे दे दिए: तुरंत बैंक/UPI ऐप को कॉल करें और cybercrime.gov.in पर रिपोर्ट करें या 1930 डायल करें।"]};return d[L]}
+const I={en:0,hn:1,hi:2};
+function render(a){
+ const L=LANG(),i=I[L],c={r:'b-r',o:'b-o',y:'b-y',w:'b-w'}[a.v];
+ const w=[a.pay&&t('wp'),a.otp&&t('wo'),a.med&&t('med')].filter(Boolean).map(x=>`<div class="warn">${x}</div>`).join('');
+ $('res').innerHTML=`<div class="card">${w}<div style="margin-top:10px"><span class="badge ${c}">${t('V')[a.v]}</span></div>
+ <p><b>${t('claim')}:</b> <span class="tag">${t('unv')}</span><br>“${esc(a.claim)}”</p>
+ <p><b>${t('cat')}:</b> ${a.cat} · <b>${t('conf')}:</b> ${a.conf}%<div class="bar"><i style="width:${a.conf}%"></i></div></p>
+ <p><span class="tag">${t('fact')}</span>${t('vd')[a.v]}</p>
+ <p class="mu"><span class="tag">${t('inf')}</span>${t('es')[a.v]}</p>
+ <h2>${t('why')} / ${t('flags')}</h2><ul>${a.fl.length?a.fl.map(f=>`<li>🚩 ${f[i]}</li>`).join(''):'<li>—</li>'}</ul>
+ <h2>${t('ev')}</h2><p class="mu">${t('evn')}</p><ul><li><a href="https://cybercrime.gov.in" target="_blank" rel="noopener">cybercrime.gov.in</a> — Official</li><li><a href="https://www.india.gov.in" target="_blank" rel="noopener">india.gov.in</a> — Official</li><li><a href="https://www.sebi.gov.in" target="_blank" rel="noopener">sebi.gov.in</a> / <a href="https://www.rbi.org.in" target="_blank" rel="noopener">rbi.org.in</a> — Official</li></ul>
+ <h2>${t('todo')}</h2><ul>${todo(a).map(x=>`<li>${x}</li>`).join('')}</ul>
+ <div class="row"><button class="chip" id="cp">📋 ${t('copy')}</button><button class="chip" onclick="print()">⬇️ ${t('print')}</button></div>
+ <div class="chat"><input id="fq" placeholder="${t('chatph')}"><button id="fs">→</button></div><div id="fa" class="mu" style="margin-top:8px"></div></div>`;
+ $('cp').onclick=()=>{const s=`Sach Mein Sahi Hai?\n${t('V')[a.v]} (${a.conf}%)\n${t('claim')}: ${a.claim}\n${todo(a).join('\n')}\n${new Date().toLocaleDateString('en-IN')}`;navigator.clipboard&&navigator.clipboard.writeText(s)};
+ $('fs').onclick=()=>{const q=$('fq').value.toLowerCase(),A={en:["I can't recover money myself. Call your bank or UPI app immediately and report at cybercrime.gov.in or 1930.","The reasons are listed above under Red Flags."],hn:["Main paisa wapas nahi dila sakta. Turant bank/UPI app ko call karein aur cybercrime.gov.in ya 1930 par report karein.","Reasons upar Red Flags me likhe hain."],hi:["मैं पैसे वापस नहीं दिला सकता। तुरंत बैंक/UPI ऐप को कॉल करें और cybercrime.gov.in या 1930 पर रिपोर्ट करें।","कारण ऊपर चेतावनी संकेतों में लिखे हैं।"]};
+  $('fa').textContent=A[L][/pay|paid|paisa|पैसे|diye|kar diya/.test(q)?0:1]};
+}
+function stats(){const n={r:0,o:0,y:0,w:0};H.forEach(h=>n[h.v]++);$('stats').innerHTML=`<div><b>${H.length}</b>Total</div><div><b>${n.r}</b>🔴</div><div><b>${n.o}</b>🟠</div><div><b>${n.y+n.w}</b>🟡⚪</div>`}
+function hist(){const f=$('q').value.toLowerCase(),rows=H.filter(h=>(h.claim+h.cat).toLowerCase().includes(f));
+ $('hist').innerHTML=rows.length?rows.map(h=>`<tr><td>${h.d}</td><td>${esc(h.claim.slice(0,40))}</td><td>${h.cat}</td><td>${t('V')[h.v].slice(0,2)}</td></tr>`).join(''):`<tr><td>${t('none')}</td></tr>`}
+function ui(){document.querySelectorAll('[data-t]').forEach(e=>e.textContent=t(e.dataset.t));$('hero').textContent=t('hero');$('tag').textContent=t('tag');$('inp').placeholder=t('ph');$('go').textContent=t('go');$('priv').textContent=t('priv');$('clr').textContent=t('clr');$('foot').textContent=t('foot');document.querySelector('h2[data-t=risk]').textContent=t('risk');if(last)render(last);stats();hist()}
+$('go').onclick=()=>{const x=$('inp').value.trim();if(!x)return;last=analyse(x);render(last);H.unshift({d:new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short'}),claim:last.claim,cat:last.cat,v:last.v});H=H.slice(0,100);save();stats();hist();$('res').scrollIntoView({behavior:'smooth'})};
+$('paste').onclick=async()=>{try{$('inp').value=await navigator.clipboard.readText()}catch(e){$('inp').focus()}};
+$('urlb').onclick=()=>{const u=prompt('URL');if(u)$('inp').value=u};
+$('shot').onchange=$('pdf').onchange=e=>{if(e.target.files[0])alert('OCR / PDF reading needs the backend (planned in v1). For now, paste the text from the file.')};
+$('mic').onclick=()=>{const S=window.SpeechRecognition||window.webkitSpeechRecognition;if(!S)return alert('Speech input is not supported in this browser.');const r=new S();r.lang='hi-IN';r.onresult=e=>{$('inp').value=e.results[0][0].transcript};r.start()};
+$('clr').onclick=()=>{H=[];save();stats();hist()};$('q').oninput=hist;$('lang').onchange=ui;ui();
+</script></body></html>
